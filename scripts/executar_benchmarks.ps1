@@ -50,23 +50,33 @@ if (-not $Mascara) { $Mascara = if ($vcpu -ge 2) { "0x2" } else { "0x1" } }
 
 Write-Host "Ambiente=$Ambiente  RAM=$ramMB MB  vCPU=$vcpu  Xmx=$XmxMB MB  afinidade=$Mascara  rep=$Repeticoes  aquec=$Aquecimento" -ForegroundColor Cyan
 
+# ---------------------------------------------------------------- java.exe real
+# O "java" do PATH pode ser o atalho javapath da Oracle, que abre a JVM como OUTRO processo:
+# o medidor mediria o atalho (~8 MB, CPU ~0). Por isso usa o java.exe de dentro do java.home.
+$props = & java -XshowSettings:properties -version 2>&1 | ForEach-Object { "$_" }
+$linhaHome = $props | Where-Object { $_ -match '^\s*java\.home\s*=' } | Select-Object -First 1
+if (-not $linhaHome) { throw "Nao consegui descobrir o java.home" }
+$javaExe = Join-Path (($linhaHome -split '=', 2)[1].Trim()) "bin\java.exe"
+if (-not (Test-Path $javaExe)) { throw "java.exe nao encontrado em $javaExe" }
+Write-Host "JVM: $javaExe"
+
 # ---------------------------------------------------------------- Combinacoes
 $jvm = @("-XX:+UseSerialGC", "-Xms${XmxMB}m", "-Xmx${XmxMB}m", "-cp", $binJava)
 $combos = @(
     @{ ling = "C";    exp = 1; prog = (Join-Path $bin "exp1_c.exe");   args = @() },
     @{ ling = "C++";  exp = 1; prog = (Join-Path $bin "exp1_cpp.exe"); args = @() },
-    @{ ling = "Java"; exp = 1; prog = "java"; args = $jvm + "Experimento1" },
+    @{ ling = "Java"; exp = 1; prog = $javaExe; args = $jvm + "Experimento1" },
     @{ ling = "C";    exp = 2; prog = (Join-Path $bin "exp2_c.exe");   args = @() },
     @{ ling = "C++";  exp = 2; prog = (Join-Path $bin "exp2_cpp.exe"); args = @() },
-    @{ ling = "Java"; exp = 2; prog = "java"; args = $jvm + "Experimento2" },
+    @{ ling = "Java"; exp = 2; prog = $javaExe; args = $jvm + "Experimento2" },
     @{ ling = "C";    exp = 3; prog = (Join-Path $bin "exp3_c.exe");   args = @() },
     @{ ling = "C++";  exp = 3; prog = (Join-Path $bin "exp3_cpp.exe"); args = @() },
-    @{ ling = "Java"; exp = 3; prog = "java"; args = $jvm + "Experimento3" }
+    @{ ling = "Java"; exp = 3; prog = $javaExe; args = $jvm + "Experimento3" }
 )
 $esperado = @{ 1 = "4a5df0a09d318eb1"; 2 = "f8d7b2fec15dd2cd"; 3 = "79292f2b7b9ef235" }
 
 foreach ($c in $combos) {
-    if ($c.prog -ne "java" -and -not (Test-Path $c.prog)) { throw "Binario nao encontrado: $($c.prog)" }
+    if (-not (Test-Path $c.prog)) { throw "Binario nao encontrado: $($c.prog)" }
 }
 
 # ---------------------------------------------------------------- Ordem: aquecimento embaralhado, depois validas embaralhadas

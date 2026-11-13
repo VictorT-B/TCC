@@ -1,0 +1,10 @@
+experimento,linguagem,AIC_linear,AIC_exponencial,melhor,taxa_exp
+1,C,-41.4552,-41.3021,linear,1.0366
+1,C++,-39.2630,-39.1764,linear,1.0298
+1,Java,-35.4348,-35.8877,exponencial,1.1596
+2,C,-4.1382,-3.8672,linear,1.0586
+2,C++,-2.8214,-2.6040,linear,1.0544
+2,Java,-4.3292,-4.1369,linear,1.0505
+3,C,-10.1569,-9.8717,linear,1.0658
+3,C++,-12.5494,-12.1315,linear,1.0730
+3,Java,-21.0416,-20.8073,linear,1.0636
