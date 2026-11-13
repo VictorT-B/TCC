@@ -20,7 +20,7 @@ Versões congeladas até o fim da coleta: Windows Update pausado e sem
 | Windows | 10 22H2, build 19045.6466 (host Pro, VM Home) |
 | GCC / G++ | 16.2.0 (Rev6, MSYS2 mingw-w64) |
 | JDK | Oracle 25.0.4.1 LTS |
-| VirtualBox | _anotar (Ajuda → Sobre)_ |
+| VirtualBox | Versão 7.2.18 r175117 (Qt6.8.0 on windows) |
 
 ## Máquina virtual
 
